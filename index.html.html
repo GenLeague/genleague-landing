@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GenLeague — The League for AI Creative Talent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600;1,700&family=Barlow+Condensed:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #5e6ad2;
+    --primary-hover: #828fff;
+    --canvas: #010102;
+    --surface-1: #0f1011;
+    --surface-2: #141516;
+    --surface-3: #18191a;
+    --hairline: #23252a;
+    --hairline-strong: #34343a;
+    --ink: #f7f8f8;
+    --ink-muted: #d0d6e0;
+    --ink-subtle: #8a8f98;
+    --ink-tertiary: #62666d;
+    --success: #27a644;
+  }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--canvas); color:var(--ink); font-family:'Barlow',-apple-system,system-ui,sans-serif; font-size:16px; line-height:1.5; overflow-x:hidden; }
+
+  .wordmark { font-family:'Barlow Condensed',sans-serif; font-style:italic; font-weight:700; font-size:22px; letter-spacing:-0.5px; line-height:1; text-decoration:none; display:inline-flex; align-items:center; }
+  .wordmark .gen { color:var(--ink); }
+  .wordmark .league { color:var(--primary-hover); }
+
+  /* NAV */
+  .nav { position:fixed; top:0; left:0; right:0; z-index:100; height:56px; display:flex; align-items:center; padding:0 32px; transition:background 0.3s; }
+  .nav.scrolled { background:rgba(1,1,2,0.92); backdrop-filter:blur(16px); border-bottom:1px solid var(--hairline); }
+  .nav-inner { max-width:1120px; width:100%; margin:0 auto; display:flex; align-items:center; justify-content:space-between; }
+  .nav-cta { font-family:'Barlow',sans-serif; font-size:13px; font-weight:600; color:#fff; background:var(--primary); border:none; padding:7px 16px; border-radius:6px; cursor:pointer; text-decoration:none; transition:background 0.15s; }
+  .nav-cta:hover { background:var(--primary-hover); }
+
+  /* HERO — tighter top padding */
+  .hero { padding:88px 32px 64px; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; top:-10%; left:50%; transform:translateX(-50%); width:900px; height:600px; background:radial-gradient(ellipse at center,rgba(94,106,210,0.13) 0%,rgba(94,106,210,0.04) 40%,transparent 70%); pointer-events:none; }
+  .hero::after { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent 0%,rgba(130,143,255,0.4) 50%,transparent 100%); }
+  .hero-inner { max-width:1120px; width:100%; margin:0 auto; display:flex; flex-direction:column; align-items:center; text-align:center; position:relative; z-index:1; }
+
+  .hero-eyebrow { display:inline-flex; align-items:center; gap:8px; background:rgba(94,106,210,0.1); border:1px solid rgba(130,143,255,0.2); color:var(--primary-hover); font-size:12px; font-weight:600; letter-spacing:0.6px; text-transform:uppercase; padding:5px 14px; border-radius:9999px; margin-bottom:24px; animation:fadeUp 0.6s ease both; }
+  .eyebrow-dot { width:6px; height:6px; background:var(--primary-hover); border-radius:9999px; animation:pulse 2s ease infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+  .hero-headline { font-family:'Barlow Condensed',sans-serif; font-style:italic; font-weight:700; font-size:clamp(52px,8vw,92px); line-height:0.95; letter-spacing:-2px; color:var(--ink); margin-bottom:20px; animation:fadeUp 0.6s ease 0.1s both; max-width:880px; }
+  .hero-headline .accent { color:var(--primary-hover); }
+
+  .hero-sub { font-size:clamp(15px,1.8vw,18px); font-weight:400; color:var(--ink-muted); line-height:1.65; max-width:480px; margin-bottom:10px; letter-spacing:-0.1px; animation:fadeUp 0.6s ease 0.18s both; }
+
+  /* Standout tagline */
+  .hero-tagline { font-size:clamp(15px,1.8vw,18px); font-weight:700; color:var(--ink); letter-spacing:0.1px; margin-bottom:28px; animation:fadeUp 0.6s ease 0.22s both; }
+
+  /* Social buttons */
+  .hero-socials { display:flex; align-items:center; gap:10px; margin-bottom:28px; animation:fadeUp 0.6s ease 0.26s both; flex-wrap:wrap; justify-content:center; }
+  .socials-label { font-size:12px; color:var(--ink-subtle); font-weight:500; margin-right:2px; white-space:nowrap; }
+  .social-btn { display:inline-flex; align-items:center; gap:7px; background:var(--surface-1); border:1px solid var(--hairline); color:var(--ink-muted); font-size:12px; font-weight:600; padding:7px 13px; border-radius:8px; text-decoration:none; transition:all 0.15s; letter-spacing:0.1px; }
+  .social-btn:hover { background:var(--surface-2); border-color:var(--hairline-strong); color:var(--ink); }
+  .social-btn svg { width:13px; height:13px; fill:currentColor; flex-shrink:0; }
+
+  /* Signup count */
+  .signup-count { display:flex; align-items:center; gap:10px; margin-bottom:14px; animation:fadeUp 0.6s ease 0.3s both; }
+  .count-avatars { display:flex; }
+  .count-avatar { width:28px; height:28px; border-radius:9999px; border:2px solid var(--canvas); margin-left:-8px; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  .count-avatar:first-child { margin-left:0; }
+  .ca-1{background:linear-gradient(135deg,#1a1535,#2a2060);color:#828fff}
+  .ca-2{background:linear-gradient(135deg,#0d2015,#1a3025);color:#27a644}
+  .ca-3{background:linear-gradient(135deg,#201510,#3a2015);color:#d07040}
+  .ca-4{background:linear-gradient(135deg,#150d20,#251535);color:#a060d0}
+  .count-text { font-size:13px; color:var(--ink-subtle); }
+  .count-text strong { color:var(--ink-muted); }
+
+  /* Form */
+  .hero-form { display:flex; align-items:center; gap:10px; width:100%; max-width:480px; animation:fadeUp 0.6s ease 0.34s both; margin-bottom:12px; }
+  .hero-input { flex:1; background:var(--surface-1); border:1px solid var(--hairline-strong); color:var(--ink); padding:14px 18px; border-radius:10px; font-size:15px; font-family:'Barlow',sans-serif; outline:none; transition:border-color 0.2s,box-shadow 0.2s; min-width:0; }
+  .hero-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(94,106,210,0.15); }
+  .hero-input::placeholder { color:var(--ink-subtle); }
+  .hero-btn { font-family:'Barlow',sans-serif; font-size:15px; font-weight:600; color:#fff; background:var(--primary); border:none; padding:14px 22px; border-radius:10px; cursor:pointer; white-space:nowrap; transition:background 0.15s,transform 0.1s; }
+  .hero-btn:hover { background:var(--primary-hover); transform:translateY(-1px); }
+  .disclaimer { font-size:12px; color:var(--ink-tertiary); animation:fadeUp 0.6s ease 0.38s both; }
+  .success-msg { display:none; align-items:center; gap:10px; background:rgba(39,166,68,0.1); border:1px solid rgba(39,166,68,0.2); color:var(--success); padding:14px 20px; border-radius:10px; font-size:14px; font-weight:500; max-width:480px; width:100%; margin-bottom:12px; }
+  .success-msg.show { display:flex; }
+
+  /* CAROUSEL */
+  .carousel-section { padding:0 32px 88px; }
+  .carousel-inner { max-width:1120px; margin:0 auto; }
+  .carousel-label { text-align:center; font-size:12px; font-weight:600; letter-spacing:0.6px; text-transform:uppercase; color:var(--ink-subtle); margin-bottom:20px; }
+  .carousel-window { background:var(--surface-1); border:1px solid var(--hairline); border-radius:16px; overflow:hidden; box-shadow:0 40px 80px rgba(0,0,0,0.5); position:relative; }
+  .carousel-chrome { background:var(--surface-2); border-bottom:1px solid var(--hairline); padding:12px 16px; display:flex; align-items:center; gap:12px; }
+  .chrome-dots { display:flex; gap:6px; }
+  .chrome-dot { width:10px; height:10px; border-radius:9999px; }
+  .cd-r{background:#ff5f57}.cd-y{background:#febc2e}.cd-g{background:#28c840}
+  .chrome-bar { flex:1; background:var(--surface-3); border:1px solid var(--hairline); border-radius:6px; padding:5px 12px; font-size:12px; color:var(--ink-subtle); text-align:center; max-width:280px; margin:0 auto; }
+  .carousel-track-wrap { overflow:hidden; }
+  .carousel-track { display:flex; transition:transform 0.5s cubic-bezier(0.4,0,0.2,1); }
+  .carousel-slide { min-width:100%; padding:20px; background:var(--canvas); }
+  .smn { background:rgba(15,16,17,0.95); border:1px solid var(--hairline); border-radius:9px; padding:9px 14px; display:flex; align-items:center; gap:18px; margin-bottom:14px; }
+  .smn-wm { font-family:'Barlow Condensed',sans-serif; font-style:italic; font-weight:700; font-size:13px; }
+  .smn-wm .gen{color:var(--ink)} .smn-wm .league{color:var(--primary-hover)}
+  .smn-links { display:flex; gap:12px; }
+  .smn-link { font-size:10px; color:var(--ink-subtle); font-weight:500; }
+  .smn-link.active { color:var(--ink); }
+  .smn-btn { margin-left:auto; font-size:10px; font-weight:600; color:#fff; background:var(--primary); padding:4px 10px; border-radius:5px; font-family:'Barlow',sans-serif; }
+  .slide-stats { background:var(--surface-1); border:1px solid var(--hairline); border-radius:9px; padding:12px 16px; display:flex; gap:16px; margin-bottom:12px; align-items:center; }
+  .ss-item { text-align:center; }
+  .ss-val { font-size:16px; font-weight:600; color:var(--primary-hover); letter-spacing:-0.4px; line-height:1; }
+  .ss-lbl { font-size:8px; text-transform:uppercase; letter-spacing:0.4px; color:var(--ink-subtle); }
+  .ss-div { width:1px; height:22px; background:var(--hairline); }
+  .ss-btn { font-size:10px; font-weight:600; color:#fff; background:var(--primary); padding:6px 11px; border-radius:5px; font-family:'Barlow',sans-serif; margin-left:auto; }
+  .slide-filters { display:flex; gap:5px; margin-bottom:12px; flex-wrap:wrap; }
+  .sf { font-size:9px; font-weight:500; color:var(--ink-subtle); background:var(--canvas); border:1px solid var(--hairline); padding:3px 9px; border-radius:9999px; }
+  .sf.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+  .slide-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .sg-card { background:var(--surface-1); border:1px solid var(--hairline); border-radius:8px; overflow:hidden; }
+  .sg-media { aspect-ratio:16/9; position:relative; }
+  .sgm-1{background:linear-gradient(135deg,#0a0a18,#14102a,#0a1220)}
+  .sgm-2{background:linear-gradient(135deg,#080f1e,#0f1e38,#040c16)}
+  .sgm-3{background:linear-gradient(135deg,#100820,#1e1040,#0c0410)}
+  .sg-shimmer { position:absolute; inset:0; background:linear-gradient(45deg,transparent 30%,rgba(130,143,255,0.06) 50%,transparent 70%); }
+  .sg-badge { position:absolute; top:7px; right:7px; background:rgba(1,1,2,0.75); backdrop-filter:blur(6px); border:1px solid var(--hairline); color:var(--ink-muted); font-size:7px; font-weight:600; padding:2px 6px; border-radius:9999px; letter-spacing:0.3px; text-transform:uppercase; }
+  .sg-body { padding:8px; }
+  .sg-name { font-size:10px; font-weight:600; color:var(--ink); margin-bottom:2px; }
+  .sg-handle { font-size:8px; color:var(--ink-subtle); margin-bottom:4px; }
+  .sg-tags { display:flex; gap:3px; flex-wrap:wrap; }
+  .sg-tag { font-size:7px; color:var(--ink-subtle); background:var(--surface-3); border:1px solid var(--hairline); padding:1px 5px; border-radius:3px; }
+  .slide-jobs { display:flex; flex-direction:column; gap:8px; }
+  .sj-card { background:var(--surface-1); border:1px solid var(--hairline); border-radius:8px; padding:12px 14px; display:flex; align-items:center; gap:12px; }
+  .sj-logo { width:34px; height:34px; border-radius:7px; background:var(--surface-3); border:1px solid var(--hairline); display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; color:var(--ink-muted); flex-shrink:0; }
+  .sj-content { flex:1; }
+  .sj-title { font-size:11px; font-weight:600; color:var(--ink); margin-bottom:2px; }
+  .sj-meta { font-size:9px; color:var(--ink-subtle); margin-bottom:5px; }
+  .sj-footer { display:flex; gap:5px; align-items:center; }
+  .sj-budget { font-size:10px; font-weight:600; color:var(--ink); background:var(--surface-2); border:1px solid var(--hairline); padding:2px 7px; border-radius:4px; }
+  .sj-urgent { font-size:8px; font-weight:600; color:#d07070; background:rgba(210,94,94,0.12); border:1px solid rgba(210,94,94,0.2); padding:2px 6px; border-radius:9999px; text-transform:uppercase; letter-spacing:0.3px; }
+  .sj-btn { margin-left:auto; font-size:10px; font-weight:600; color:#fff; background:var(--primary); padding:5px 11px; border-radius:5px; font-family:'Barlow',sans-serif; }
+  .sp-hero { background:var(--surface-1); border:1px solid var(--hairline); border-radius:9px; padding:16px; display:flex; align-items:flex-start; gap:14px; margin-bottom:12px; }
+  .sp-avatar { width:48px; height:48px; border-radius:9999px; background:linear-gradient(135deg,#1a1535,#2a2060); border:1px solid var(--hairline-strong); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:var(--primary-hover); flex-shrink:0; }
+  .sp-details { flex:1; }
+  .sp-name { font-size:13px; font-weight:600; color:var(--ink); letter-spacing:-0.2px; margin-bottom:2px; }
+  .sp-role { font-size:9px; color:var(--ink-muted); margin-bottom:8px; }
+  .sp-stats { display:flex; gap:14px; margin-bottom:8px; }
+  .sps-v { font-size:13px; font-weight:600; color:var(--ink); }
+  .sps-l { font-size:8px; color:var(--ink-subtle); }
+  .sp-tags { display:flex; gap:3px; flex-wrap:wrap; }
+  .sp-tag { font-size:8px; color:var(--ink-subtle); background:var(--surface-3); border:1px solid var(--hairline); padding:2px 6px; border-radius:3px; }
+  .sp-avail { font-size:8px; font-weight:500; color:var(--success); background:rgba(39,166,68,0.12); border:1px solid rgba(39,166,68,0.2); padding:2px 8px; border-radius:9999px; }
+  .sp-actions { display:flex; gap:5px; margin-left:auto; flex-shrink:0; }
+  .sp-btn-s { font-size:9px; font-weight:600; color:var(--ink); background:var(--surface-2); border:1px solid var(--hairline); padding:6px 10px; border-radius:5px; font-family:'Barlow',sans-serif; }
+  .sp-btn-p { font-size:9px; font-weight:600; color:#fff; background:var(--primary); padding:6px 10px; border-radius:5px; font-family:'Barlow',sans-serif; border:none; }
+  .sp-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .sp-port { background:var(--surface-1); border:1px solid var(--hairline); border-radius:8px; overflow:hidden; }
+  .sp-port-media { aspect-ratio:4/3; position:relative; }
+  .sp-port-info { padding:7px; border-top:1px solid var(--hairline); }
+  .sp-port-title { font-size:9px; font-weight:600; color:var(--ink); margin-bottom:1px; }
+  .sp-port-meta { font-size:7px; color:var(--ink-subtle); }
+  .carousel-controls { display:flex; align-items:center; justify-content:center; gap:8px; padding:14px; background:var(--surface-1); border-top:1px solid var(--hairline); }
+  .c-dot { width:6px; height:6px; border-radius:9999px; background:var(--hairline-strong); cursor:pointer; transition:all 0.2s; border:none; }
+  .c-dot.active { background:var(--primary-hover); width:20px; }
+  .c-arrow { background:var(--surface-2); border:1px solid var(--hairline); color:var(--ink-subtle); width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; transition:all 0.15s; position:absolute; top:50%; transform:translateY(-50%); z-index:10; }
+  .c-prev { left:14px; }
+  .c-next { right:14px; }
+  .c-arrow:hover { background:var(--surface-3); color:var(--ink); }
+
+  /* TOOLS — seamless with fade mask */
+  .tools-section { padding:52px 32px; border-top:1px solid var(--hairline); border-bottom:1px solid var(--hairline); overflow:hidden; position:relative; }
+  .tools-section::before, .tools-section::after { content:''; position:absolute; top:0; bottom:0; width:120px; z-index:2; pointer-events:none; }
+  .tools-section::before { left:0; background:linear-gradient(90deg, var(--canvas) 0%, transparent 100%); }
+  .tools-section::after { right:0; background:linear-gradient(270deg, var(--canvas) 0%, transparent 100%); }
+  .tools-label { text-align:center; font-size:12px; font-weight:500; color:var(--ink-tertiary); letter-spacing:0.4px; text-transform:uppercase; margin-bottom:26px; position:relative; z-index:3; }
+  .tools-track-wrap { overflow:hidden; }
+  .tools-track { display:flex; gap:10px; animation:scrollLeft 40s linear infinite; width:max-content; }
+  .tools-track:hover { animation-play-state:paused; }
+  @keyframes scrollLeft { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+  .tool-chip { background:var(--surface-1); border:1px solid var(--hairline); padding:8px 18px; border-radius:9999px; font-size:13px; font-weight:500; color:var(--ink-muted); white-space:nowrap; flex-shrink:0; transition:border-color 0.2s,color 0.2s; }
+  .tool-chip:hover { border-color:var(--primary); color:var(--primary-hover); }
+
+  /* VALUE */
+  .value-section { padding:88px 32px; }
+  .value-inner { max-width:1120px; margin:0 auto; }
+  .section-eyebrow { font-size:12px; font-weight:600; letter-spacing:0.6px; text-transform:uppercase; color:var(--primary-hover); margin-bottom:16px; display:flex; align-items:center; gap:10px; }
+  .section-eyebrow::before { content:''; width:24px; height:1px; background:var(--primary-hover); }
+  .section-headline { font-family:'Barlow Condensed',sans-serif; font-style:italic; font-weight:700; font-size:clamp(34px,5vw,52px); letter-spacing:-1px; line-height:1.05; color:var(--ink); margin-bottom:48px; max-width:560px; }
+  .value-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; background:var(--hairline); border-radius:14px; overflow:hidden; }
+  .value-card { background:var(--surface-1); padding:36px 30px; position:relative; overflow:hidden; transition:background 0.2s; }
+  .value-card:hover { background:var(--surface-2); }
+  .value-card::before { content:''; position:absolute; top:-1px; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent 0%,var(--primary) 50%,transparent 100%); opacity:0; transition:opacity 0.3s; }
+  .value-card:hover::before { opacity:1; }
+  .value-number { font-family:'Barlow Condensed',sans-serif; font-style:italic; font-weight:700; font-size:13px; color:var(--primary-hover); letter-spacing:0.5px; margin-bottom:16px; opacity:0.6; }
+  .value-icon { width:42px; height:42px; background:rgba(94,106,210,0.1); border:1px solid rgba(130,143,255,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:16px; font-size:19px; }
+  .value-title { font-size:16px; font-weight:600; color:var(--ink); letter-spacing:-0.3px; margin-bottom:10px; line-height:1.3; }
+  .value-body { font-size:14px; color:var(--ink-muted); line-height:1.7; }
+
+  /* HOW IT WORKS */
+  .how-section { padding:88px 32px; }
+  .how-inner { max-width:1120px; margin:0 auto; }
+  .how-steps { display:grid; grid-template-columns:repeat(3,1fr); gap:48px; margin-top:48px; position:relative; }
+  /* Full-width connecting line fixed */
+  .how-steps::before {
+    content:'';
+    position:absolute;
+    top:28px;
+    left:28px;
+    right:28px;
+    height:1px;
+    background:linear-gradient(90deg, rgba(94,106,210,0.6) 0%, rgba(94,106,210,0.6) 100%);
+    z-index:0;
+  }
+  .how-step { position:relative; z-index:1; }
+  .step-number { width:56px; height:56px; background:var(--surface-1); border:1px solid var(--hairline-strong); border-radius:9999px; display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-style:italic; font-weight:700; font-size:20px; color:var(--primary-hover); margin-bottom:20px; position:relative; z-index:2; transition:background 0.2s,border-color 0.2s; }
+  .how-step:hover .step-number { background:rgba(94,106,210,0.1); border-color:var(--primary); }
+  .step-title { font-size:16px; font-weight:600; color:var(--ink); letter-spacing:-0.3px; margin-bottom:10px; }
+  .step-body { font-size:14px; color:var(--ink-muted); line-height:1.7; }
+
+  /* WAITLIST CTA */
+  .waitlist-section { padding:0 32px 88px; }
+  .waitlist-inner { max-width:1120px; margin:0 auto; }
+  .waitlist-card { background:var(--surface-1); border:1px solid var(--hairline); border-radius:20px; padding:64px; text-align:center; position:relative; overflow:hidden; }
+  .waitlist-card::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% -20%,rgba(94,106,210,0.1) 0%,transparent 60%); pointer-events:none; }
+  .waitlist-card::after { content:''; position:absolute; top:-1px; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent 0%,rgba(130,143,255,0.4) 50%,transparent 100%); }
+  .waitlist-content { position:relative; z-index:1; }
+  .waitlist-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(94,106,210,0.1); border:1px solid rgba(130,143,255,0.2); color:var(--primary-hover); font-size:11px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; padding:5px 14px; border-radius:9999px; margin-bottom:24px; }
+  .waitlist-headline { font-family:'Barlow Condensed',sans-serif; font-style:italic; font-weight:700; font-size:clamp(34px,5vw,52px); letter-spacing:-1px; line-height:1.05; color:var(--ink); margin-bottom:16px; }
+  .waitlist-body { font-size:17px; color:var(--ink-muted); line-height:1.7; margin-bottom:36px; max-width:500px; margin-left:auto; margin-right:auto; }
+  .waitlist-form { display:flex; gap:10px; max-width:440px; margin:0 auto 12px; }
+  .waitlist-input { flex:1; background:var(--surface-2); border:1px solid var(--hairline-strong); color:var(--ink); padding:14px 16px; border-radius:10px; font-size:15px; font-family:'Barlow',sans-serif; outline:none; transition:border-color 0.2s,box-shadow 0.2s; min-width:0; }
+  .waitlist-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(94,106,210,0.12); }
+  .waitlist-input::placeholder { color:var(--ink-subtle); }
+  .waitlist-btn { font-family:'Barlow',sans-serif; font-size:15px; font-weight:600; color:#fff; background:var(--primary); border:none; padding:14px 24px; border-radius:10px; cursor:pointer; white-space:nowrap; transition:background 0.15s; }
+  .waitlist-btn:hover { background:var(--primary-hover); }
+  .waitlist-success { display:none; align-items:center; justify-content:center; gap:10px; background:rgba(39,166,68,0.1); border:1px solid rgba(39,166,68,0.2); color:var(--success); padding:16px 24px; border-radius:10px; font-size:14px; font-weight:500; max-width:440px; margin:0 auto 12px; }
+  .waitlist-success.show { display:flex; }
+
+  /* FOOTER */
+  footer { border-top:1px solid var(--hairline); padding:36px 32px; }
+  .footer-inner { max-width:1120px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; }
+  .footer-links { display:flex; gap:22px; list-style:none; }
+  .footer-links a { color:var(--ink-subtle); font-size:13px; text-decoration:none; transition:color 0.15s; }
+  .footer-links a:hover { color:var(--ink); }
+  .footer-copy { font-size:12px; color:var(--ink-tertiary); }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  .reveal { opacity:0; transform:translateY(24px); transition:opacity 0.6s ease,transform 0.6s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+  .rd1{transition-delay:0.1s} .rd2{transition-delay:0.2s}
+
+  @media(max-width:768px){
+    .hero{padding:80px 20px 48px}
+    .hero-headline{font-size:52px;letter-spacing:-1.5px}
+    .hero-form{flex-direction:column}
+    .hero-btn{width:100%;text-align:center}
+    .hero-socials{justify-content:center}
+    .value-grid,.how-steps{grid-template-columns:1fr}
+    .how-steps::before{display:none}
+    .waitlist-card{padding:36px 20px}
+    .waitlist-form{flex-direction:column}
+    .waitlist-btn{width:100%}
+    .slide-grid,.sp-grid{grid-template-columns:repeat(2,1fr)}
+    .footer-inner{flex-direction:column;gap:16px;text-align:center}
+    .footer-links{flex-wrap:wrap;justify-content:center;gap:14px}
+    nav,.carousel-section,.tools-section,.value-section,.how-section,.waitlist-section,footer{padding-left:20px;padding-right:20px}
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <span class="wordmark"><span class="gen">GEN</span><span class="league">LEAGUE</span></span>
+    <a class="nav-cta" href="#waitlist">Join our waitlist</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow"><span class="eyebrow-dot"></span>Coming soon — be first in the league</div>
+    <h1 class="hero-headline">The league for<br><span class="accent">AI creative</span> talent.</h1>
+    <p class="hero-sub">GenLeague is the professional home built exclusively for AI creatives — launching soon.</p>
+    <p class="hero-tagline">Showcase your work. Get discovered. Get hired.</p>
+
+    <!-- Social follow buttons -->
+    <div class="hero-socials">
+      <span class="socials-label">Follow GenLeague:</span>
+      <a class="social-btn" href="https://x.com/thegenleague" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.631zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        @TheGenLeague
+      </a>
+      <a class="social-btn" href="https://instagram.com/thegenleague" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        @thegenleague
+      </a>
+      <a class="social-btn" href="https://tiktok.com/@genleague" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.19 8.19 0 004.84 1.56V6.79a4.85 4.85 0 01-1.07-.1z"/></svg>
+        @genleague
+      </a>
+    </div>
+
+    <div class="signup-count">
+      <div class="count-avatars">
+        <div class="count-avatar ca-1">MK</div>
+        <div class="count-avatar ca-2">JR</div>
+        <div class="count-avatar ca-3">SP</div>
+        <div class="count-avatar ca-4">AL</div>
+      </div>
+      <span class="count-text"><strong>174 AI creatives</strong> already on the waitlist</span>
+    </div>
+
+    <form class="hero-form" id="hero-form" onsubmit="submitHero(event)">
+      <input class="hero-input" type="email" placeholder="Enter your email for early access" required>
+      <button class="hero-btn" type="submit">Join our waitlist →</button>
+    </form>
+    <div class="success-msg" id="hero-success"><span>✓</span> You're on the waitlist. We'll reach out before launch.</div>
+    <p class="disclaimer">Free to join · No spam · Founding member perks at launch</p>
+  </div>
+</section>
+
+<!-- CAROUSEL -->
+<section class="carousel-section">
+  <div class="carousel-inner">
+    <p class="carousel-label reveal">A glimpse of GenLeague</p>
+    <div class="carousel-window reveal rd1" id="carousel-win">
+      <div class="carousel-chrome">
+        <div class="chrome-dots"><div class="chrome-dot cd-r"></div><div class="chrome-dot cd-y"></div><div class="chrome-dot cd-g"></div></div>
+        <div class="chrome-bar">thegenleague.com</div>
+      </div>
+      <div class="carousel-track-wrap">
+        <div class="carousel-track" id="c-track">
+          <!-- Slide 1: Discover -->
+          <div class="carousel-slide">
+            <div class="smn"><div class="smn-wm"><span class="gen">GEN</span><span class="league">LEAGUE</span></div><div class="smn-links"><span class="smn-link active">Discover</span><span class="smn-link">Jobs</span><span class="smn-link">Trending</span></div><div class="smn-btn">Join our waitlist</div></div>
+            <div class="slide-stats"><div class="ss-item"><div class="ss-val">2.4K</div><div class="ss-lbl">Creators</div></div><div class="ss-div"></div><div class="ss-item"><div class="ss-val">18K</div><div class="ss-lbl">Projects</div></div><div class="ss-div"></div><div class="ss-item"><div class="ss-val">340</div><div class="ss-lbl">Open Jobs</div></div><div class="ss-div"></div><div class="ss-item"><div class="ss-val">94%</div><div class="ss-lbl">Hire Rate</div></div><div class="ss-btn">Create profile</div></div>
+            <div class="slide-filters"><div class="sf active">All</div><div class="sf">AI Video</div><div class="sf">AI Image</div><div class="sf">AI Motion</div><div class="sf">AI Audio</div><div class="sf">AI Branding</div></div>
+            <div class="slide-grid">
+              <div class="sg-card"><div class="sg-media sgm-1"><div class="sg-shimmer"></div><div class="sg-badge">AI Video</div></div><div class="sg-body"><div class="sg-name">Maya Kato</div><div class="sg-handle">@mayakato</div><div class="sg-tags"><span class="sg-tag">Runway</span><span class="sg-tag">Kling</span></div></div></div>
+              <div class="sg-card"><div class="sg-media sgm-2"><div class="sg-shimmer"></div><div class="sg-badge">AI Image</div></div><div class="sg-body"><div class="sg-name">James Rivera</div><div class="sg-handle">@jrivera.ai</div><div class="sg-tags"><span class="sg-tag">Midjourney</span></div></div></div>
+              <div class="sg-card"><div class="sg-media sgm-3"><div class="sg-shimmer"></div><div class="sg-badge">AI Motion</div></div><div class="sg-body"><div class="sg-name">Sofia Park</div><div class="sg-handle">@sofiapark</div><div class="sg-tags"><span class="sg-tag">Stable Diffusion</span></div></div></div>
+            </div>
+          </div>
+          <!-- Slide 2: Jobs -->
+          <div class="carousel-slide">
+            <div class="smn"><div class="smn-wm"><span class="gen">GEN</span><span class="league">LEAGUE</span></div><div class="smn-links"><span class="smn-link">Discover</span><span class="smn-link active">Jobs</span><span class="smn-link">Trending</span></div><div class="smn-btn">Join our waitlist</div></div>
+            <div class="slide-filters" style="margin-bottom:12px"><div class="sf active">All Jobs</div><div class="sf">AI Video</div><div class="sf">AI Image</div><div class="sf">Ongoing</div><div class="sf">Full-time</div></div>
+            <div class="slide-jobs">
+              <div class="sj-card"><div class="sj-logo">VX</div><div class="sj-content"><div class="sj-title">AI Video Director — Brand Campaigns</div><div class="sj-meta">Voxel Studios · Remote · One-off</div><div class="sj-footer"><span class="sj-budget">$3,000–$5,000</span><span class="sj-urgent">Urgent</span><span class="sg-tag">Runway</span><span class="sg-tag">Sora</span></div></div><div class="sj-btn">Apply</div></div>
+              <div class="sj-card"><div class="sj-logo">NM</div><div class="sj-content"><div class="sj-title">AI Image Artist — Editorial & Fashion</div><div class="sj-meta">Nova Magazine · Remote · Ongoing retainer</div><div class="sj-footer"><span class="sj-budget">$800–$1,200/mo</span><span class="sg-tag">Midjourney</span><span class="sg-tag">Firefly</span></div></div><div class="sj-btn">Apply</div></div>
+              <div class="sj-card"><div class="sj-logo">AX</div><div class="sj-content"><div class="sj-title">Generative Motion Designer</div><div class="sj-meta">Axiom Creative Agency · Remote · Full-time</div><div class="sj-footer"><span class="sj-budget">$80K–$110K/yr</span><span class="sg-tag">Stable Diffusion</span><span class="sg-tag">After Effects</span></div></div><div class="sj-btn">Apply</div></div>
+            </div>
+          </div>
+          <!-- Slide 3: Profile -->
+          <div class="carousel-slide">
+            <div class="smn"><div class="smn-wm"><span class="gen">GEN</span><span class="league">LEAGUE</span></div><div class="smn-links"><span class="smn-link">Discover</span><span class="smn-link">Jobs</span><span class="smn-link active">Profile</span></div><div class="smn-btn">Join our waitlist</div></div>
+            <div class="sp-hero">
+              <div class="sp-avatar">MK</div>
+              <div class="sp-details">
+                <div class="sp-name">Maya Kato</div>
+                <div class="sp-role">AI Video Director · Motion Designer · GenLeague Member</div>
+                <div class="sp-stats"><div><div class="sps-v">47</div><div class="sps-l">Projects</div></div><div><div class="sps-v">12</div><div class="sps-l">Clients</div></div><div><div class="sps-v">4.9</div><div class="sps-l">Rating</div></div></div>
+                <div class="sp-tags"><span class="sp-tag">Runway</span><span class="sp-tag">Kling</span><span class="sp-tag">Sora</span><span class="sp-tag">After Effects</span><span class="sp-avail">Available</span></div>
+              </div>
+              <div class="sp-actions"><div class="sp-btn-s">Message</div><div class="sp-btn-p">Hire on GenLeague</div></div>
+            </div>
+            <div class="sp-grid">
+              <div class="sp-port"><div class="sp-port-media sgm-1"><div class="sg-shimmer"></div><div class="sg-badge">AI Video</div></div><div class="sp-port-info"><div class="sp-port-title">Luxury Brand Campaign</div><div class="sp-port-meta">Runway · Kling · Commercial</div></div></div>
+              <div class="sp-port"><div class="sp-port-media sgm-3"><div class="sg-shimmer"></div><div class="sg-badge">AI Motion</div></div><div class="sp-port-info"><div class="sp-port-title">Film Festival Title Sequence</div><div class="sp-port-meta">Sora · After Effects · Personal</div></div></div>
+              <div class="sp-port"><div class="sp-port-media sgm-2"><div class="sg-shimmer"></div><div class="sg-badge">AI Video</div></div><div class="sp-port-info"><div class="sp-port-title">Product Launch — Tech Startup</div><div class="sp-port-meta">Runway · Topaz · Commercial</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="c-arrow c-prev" onclick="moveSlide(-1)">←</button>
+      <button class="c-arrow c-next" onclick="moveSlide(1)">→</button>
+      <div class="carousel-controls">
+        <button class="c-dot active" onclick="goSlide(0)" id="d0"></button>
+        <button class="c-dot" onclick="goSlide(1)" id="d1"></button>
+        <button class="c-dot" onclick="goSlide(2)" id="d2"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLS — seamless infinite scroll -->
+<section class="tools-section">
+  <p class="tools-label">Showcase the work you make with your favourite tools</p>
+  <div class="tools-track-wrap">
+    <div class="tools-track">
+      <div class="tool-chip">Midjourney</div><div class="tool-chip">Runway</div><div class="tool-chip">Sora</div><div class="tool-chip">ElevenLabs</div><div class="tool-chip">Kling</div><div class="tool-chip">Higgsfield</div><div class="tool-chip">Stable Diffusion</div><div class="tool-chip">ComfyUI</div><div class="tool-chip">Veo 2</div><div class="tool-chip">Firefly</div><div class="tool-chip">Pika</div><div class="tool-chip">Topaz</div><div class="tool-chip">Udio</div><div class="tool-chip">Suno</div><div class="tool-chip">Leonardo</div><div class="tool-chip">Magnific</div><div class="tool-chip">Ideogram</div><div class="tool-chip">Luma</div><div class="tool-chip">Hailuo</div><div class="tool-chip">InVideo</div><div class="tool-chip">Krea</div>
+      <!-- Exact duplicate for seamless loop -->
+      <div class="tool-chip">Midjourney</div><div class="tool-chip">Runway</div><div class="tool-chip">Sora</div><div class="tool-chip">ElevenLabs</div><div class="tool-chip">Kling</div><div class="tool-chip">Higgsfield</div><div class="tool-chip">Stable Diffusion</div><div class="tool-chip">ComfyUI</div><div class="tool-chip">Veo 2</div><div class="tool-chip">Firefly</div><div class="tool-chip">Pika</div><div class="tool-chip">Topaz</div><div class="tool-chip">Udio</div><div class="tool-chip">Suno</div><div class="tool-chip">Leonardo</div><div class="tool-chip">Magnific</div><div class="tool-chip">Ideogram</div><div class="tool-chip">Luma</div><div class="tool-chip">Hailuo</div><div class="tool-chip">InVideo</div><div class="tool-chip">Krea</div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUE PROPS -->
+<section class="value-section">
+  <div class="value-inner">
+    <div class="section-eyebrow reveal">Why GenLeague</div>
+    <h2 class="section-headline reveal rd1">AI creative work deserves its own platform.</h2>
+    <div class="value-grid">
+      <div class="value-card reveal">
+        <div class="value-number">01</div>
+        <div class="value-icon">🎨</div>
+        <div class="value-title">Built for how AI creatives actually work</div>
+        <div class="value-body">Tag your tools, show your process, and let your portfolio speak. GenLeague understands the difference between Midjourney and ComfyUI, between Runway and Kling — built by people who use them.</div>
+      </div>
+      <div class="value-card reveal rd1">
+        <div class="value-number">02</div>
+        <div class="value-icon">🔍</div>
+        <div class="value-title">Get discovered by clients who get it</div>
+        <div class="value-body">Brands, agencies, and studios that understand AI creative work come to GenLeague first. No more explaining what you do. The clients here already know — they just need to find you.</div>
+      </div>
+      <div class="value-card reveal rd2">
+        <div class="value-number">03</div>
+        <div class="value-icon">💼</div>
+        <div class="value-title">A job board that fits the work</div>
+        <div class="value-body">AI creative jobs from clients who understand the craft. Browse by tool, category, and budget. Apply directly and get to work — no generic freelance marketplace noise.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section">
+  <div class="how-inner">
+    <div class="section-eyebrow reveal">How GenLeague works</div>
+    <h2 class="section-headline reveal rd1">Three steps into the league.</h2>
+    <div class="how-steps">
+      <div class="how-step reveal">
+        <div class="step-number">01</div>
+        <div class="step-title">Build your profile</div>
+        <div class="step-body">Upload your best work, tag your tools, and show your creative process. Your GenLeague profile is your professional identity in the AI creative world.</div>
+      </div>
+      <div class="how-step reveal rd1">
+        <div class="step-number">02</div>
+        <div class="step-title">Get discovered</div>
+        <div class="step-body">Clients browse GenLeague looking for exactly what you do. Your work gets in front of people who are ready to hire — not just browse.</div>
+      </div>
+      <div class="how-step reveal rd2">
+        <div class="step-number">03</div>
+        <div class="step-title">Get hired and grow</div>
+        <div class="step-body">Work directly with clients through GenLeague. Build your reputation with reviews and ratings. The more you work, the stronger your standing in the league.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WAITLIST CTA -->
+<section class="waitlist-section" id="waitlist">
+  <div class="waitlist-inner">
+    <div class="waitlist-card reveal">
+      <div class="waitlist-content">
+        <div class="waitlist-badge">🚀 Launching soon</div>
+        <h2 class="waitlist-headline">Get early access to GenLeague.</h2>
+        <p class="waitlist-body">We're building the professional home for AI creative talent. Join the waitlist to be first in the door when GenLeague launches.</p>
+        <form class="waitlist-form" id="waitlist-form" onsubmit="submitWaitlist(event)">
+          <input class="waitlist-input" type="email" placeholder="Your email address" required>
+          <button class="waitlist-btn" type="submit">Join our waitlist</button>
+        </form>
+        <div class="waitlist-success" id="waitlist-success"><span>✓</span> You're on the waitlist. We'll be in touch before we launch.</div>
+        <p class="disclaimer">Free to join · No spam · Founding member perks at launch</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <span class="wordmark"><span class="gen">GEN</span><span class="league">LEAGUE</span></span>
+    <ul class="footer-links">
+      <li><a href="https://x.com/thegenleague" target="_blank">X / Twitter</a></li>
+      <li><a href="https://instagram.com/thegenleague" target="_blank">Instagram</a></li>
+      <li><a href="https://tiktok.com/@genleague" target="_blank">TikTok</a></li>
+      <li><a href="#">Terms</a></li>
+      <li><a href="#">Privacy</a></li>
+    </ul>
+    <p class="footer-copy">© 2026 GenLeague. The league for AI creative talent.</p>
+  </div>
+</footer>
+
+<script>
+  window.addEventListener('scroll', () => {
+    document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
+  });
+  function submitHero(e) {
+    e.preventDefault();
+    document.getElementById('hero-form').style.display = 'none';
+    document.getElementById('hero-success').classList.add('show');
+  }
+  function submitWaitlist(e) {
+    e.preventDefault();
+    document.getElementById('waitlist-form').style.display = 'none';
+    document.getElementById('waitlist-success').classList.add('show');
+  }
+  let cur = 0;
+  const total = 3;
+  function updateCarousel() {
+    document.getElementById('c-track').style.transform = `translateX(-${cur * 100}%)`;
+    for (let i = 0; i < total; i++) {
+      document.getElementById('d' + i).classList.toggle('active', i === cur);
+    }
+  }
+  function moveSlide(dir) { cur = (cur + dir + total) % total; updateCarousel(); }
+  function goSlide(i) { cur = i; updateCarousel(); }
+  setInterval(() => moveSlide(1), 5000);
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
