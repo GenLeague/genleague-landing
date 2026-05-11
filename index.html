@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GenLeague — The League for AI Creative Talent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600;1,700&family=Kanit:ital,wght@0,400;0,500;0,600;0,700;1,600;1,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --lime:#e1f834; --lime-dim:rgba(225,248,52,0.1); --lime-border:rgba(225,248,52,0.22);
+    --canvas:#010102; --s1:#0f1011; --s2:#141516; --s3:#18191a;
+    --h:#23252a; --hs:#34343a; --ink:#f7f8f8; --im:#d0d6e0; --is:#8a8f98; --it:#62666d; --ok:#27a644;
+  }
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--canvas);color:var(--ink);font-family:'Barlow',-apple-system,system-ui,sans-serif;font-size:16px;line-height:1.5;overflow-x:hidden}
+
+  .logo-wm{height:28px;width:auto;display:block;cursor:pointer}
+  .logo-sm{height:20px;width:auto;display:block}
+
+  /* NAV */
+  .nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;padding:0 32px;transition:background 0.3s}
+  .nav.scrolled{background:rgba(1,1,2,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--h)}
+  .nav-inner{max-width:1120px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+  .nav-cta{font-size:13px;font-weight:700;color:#000;background:var(--lime);border:none;padding:7px 16px;border-radius:6px;cursor:pointer;text-decoration:none;transition:opacity 0.15s}
+  .nav-cta:hover{opacity:0.85}
+
+  /* HERO */
+  .hero{padding:88px 32px 64px;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;top:-10%;left:50%;transform:translateX(-50%);width:900px;height:600px;background:radial-gradient(ellipse at center,rgba(225,248,52,0.07) 0%,rgba(225,248,52,0.02) 40%,transparent 70%);pointer-events:none}
+  .hero::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(225,248,52,0.35) 50%,transparent 100%)}
+  .hero-inner{max-width:1120px;width:100%;margin:0 auto;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;z-index:1}
+  .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--lime-dim);border:1px solid var(--lime-border);color:var(--lime);font-size:12px;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;padding:5px 14px;border-radius:9999px;margin-bottom:28px;animation:fadeUp 0.6s ease both}
+  .eyebrow-dot{width:6px;height:6px;background:var(--lime);border-radius:9999px;animation:pulse 2s ease infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+  .hero-headline{font-family:'Kanit',sans-serif;font-style:italic;font-weight:700;font-size:clamp(52px,8vw,92px);line-height:0.95;letter-spacing:-1px;color:var(--ink);margin-bottom:20px;animation:fadeUp 0.6s ease 0.1s both;max-width:880px}
+  .hero-headline .accent{color:var(--lime)}
+  .hero-sub{font-size:clamp(15px,1.8vw,18px);color:var(--im);line-height:1.65;max-width:480px;margin-bottom:10px;animation:fadeUp 0.6s ease 0.18s both}
+  .hero-tagline{font-size:clamp(15px,1.8vw,18px);font-weight:700;color:var(--ink);margin-bottom:28px;animation:fadeUp 0.6s ease 0.22s both}
+  .hero-socials{display:flex;align-items:center;gap:10px;margin-bottom:28px;animation:fadeUp 0.6s ease 0.26s both;flex-wrap:wrap;justify-content:center}
+  .socials-label{font-size:12px;color:var(--is);font-weight:500}
+  .social-btn{display:inline-flex;align-items:center;gap:7px;background:var(--s1);border:1px solid var(--h);color:var(--im);font-size:12px;font-weight:600;padding:7px 13px;border-radius:8px;text-decoration:none;transition:all 0.15s}
+  .social-btn:hover{background:var(--s2);border-color:var(--hs);color:var(--ink)}
+  .social-btn svg{width:13px;height:13px;fill:currentColor;flex-shrink:0}
+  .signup-count{display:flex;align-items:center;gap:10px;margin-bottom:14px;animation:fadeUp 0.6s ease 0.3s both}
+  .count-avatars{display:flex}
+  .count-avatar{width:28px;height:28px;border-radius:9999px;border:2px solid var(--canvas);margin-left:-8px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .count-avatar:first-child{margin-left:0}
+  .ca-1{background:linear-gradient(135deg,#1a1535,#2a2060);color:#828fff}
+  .ca-2{background:linear-gradient(135deg,#0d2015,#1a3025);color:#27a644}
+  .ca-3{background:linear-gradient(135deg,#201510,#3a2015);color:#d07040}
+  .ca-4{background:linear-gradient(135deg,#1a1a00,#2a2800);color:#e1f834}
+  .count-text{font-size:13px;color:var(--is)}
+  .count-text strong{color:var(--im)}
+  .hero-form{display:flex;align-items:center;gap:10px;width:100%;max-width:480px;animation:fadeUp 0.6s ease 0.34s both;margin-bottom:12px}
+  .hero-input{flex:1;background:var(--s1);border:1px solid var(--hs);color:var(--ink);padding:14px 18px;border-radius:10px;font-size:15px;font-family:'Barlow',sans-serif;outline:none;transition:border-color 0.2s,box-shadow 0.2s;min-width:0}
+  .hero-input:focus{border-color:var(--lime);box-shadow:0 0 0 3px rgba(225,248,52,0.1)}
+  .hero-input::placeholder{color:var(--is)}
+  .hero-btn{font-size:15px;font-weight:700;color:#000;background:var(--lime);border:none;padding:14px 22px;border-radius:10px;cursor:pointer;white-space:nowrap;transition:opacity 0.15s,transform 0.1s}
+  .hero-btn:hover{opacity:0.88;transform:translateY(-1px)}
+  .disclaimer{font-size:12px;color:var(--it);animation:fadeUp 0.6s ease 0.38s both}
+  .success-msg{display:none;align-items:center;gap:10px;background:rgba(39,166,68,0.1);border:1px solid rgba(39,166,68,0.2);color:var(--ok);padding:14px 20px;border-radius:10px;font-size:14px;font-weight:500;max-width:480px;width:100%;margin-bottom:12px}
+  .success-msg.show{display:flex}
+
+  /* CAROUSEL */
+  .carousel-section{padding:0 32px 88px}
+  .carousel-inner{max-width:1120px;margin:0 auto}
+  .carousel-label{text-align:center;font-size:12px;font-weight:600;letter-spacing:0.4px;color:var(--is);margin-bottom:20px}
+  .carousel-window{background:var(--s1);border:1px solid var(--h);border-radius:16px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.5);position:relative}
+  .c-chrome{background:var(--s2);border-bottom:1px solid var(--h);padding:12px 16px;display:flex;align-items:center;gap:12px}
+  .c-dots{display:flex;gap:6px}
+  .cdot-sys{width:10px;height:10px;border-radius:9999px}
+  .cdr{background:#ff5f57}.cdy{background:#febc2e}.cdg{background:#28c840}
+  .c-url{flex:1;background:var(--s3);border:1px solid var(--h);border-radius:6px;padding:5px 12px;font-size:12px;color:var(--is);text-align:center;max-width:280px;margin:0 auto}
+  .c-track-wrap{overflow:hidden}
+  .c-track{display:flex;transition:transform 0.5s cubic-bezier(0.4,0,0.2,1)}
+  .c-slide{min-width:100%;background:var(--canvas)}
+
+  /* Slide nav */
+  .s-nav{background:rgba(1,1,2,0.96);border-bottom:1px solid var(--h);padding:9px 16px;display:flex;align-items:center;gap:16px}
+  .s-nav-logo{height:18px;width:auto}
+  .s-nav-links{display:flex;gap:14px}
+  .snl{font-size:10px;color:var(--is);font-weight:500}
+  .snl.on{color:var(--ink);border-bottom:1px solid var(--lime);padding-bottom:1px}
+  .s-nav-right{margin-left:auto;font-size:10px;font-weight:700;color:#000;background:var(--lime);padding:5px 12px;border-radius:5px}
+
+  /* Page header */
+  .s-header{padding:12px 18px 8px;border-bottom:1px solid var(--h)}
+  .s-eye{font-size:9px;font-weight:600;color:var(--lime);letter-spacing:0.5px;margin-bottom:2px}
+  .s-title{font-size:17px;font-weight:600;color:var(--ink);letter-spacing:-0.4px;margin-bottom:2px}
+  .s-sub{font-size:10px;color:var(--is)}
+
+  /* Stats */
+  .s-stats{display:flex;background:var(--s1);border-bottom:1px solid var(--h)}
+  .ss{padding:8px 16px;text-align:center;border-right:1px solid var(--h)}
+  .ss:last-child{border-right:none;margin-left:auto;display:flex;align-items:center}
+  .ss-v{font-size:15px;font-weight:700;color:var(--lime);letter-spacing:-0.4px;line-height:1}
+  .ss-l{font-size:7px;text-transform:uppercase;letter-spacing:0.4px;color:var(--is);margin-top:2px}
+  .ss-btn{font-size:10px;font-weight:700;color:#000;background:var(--lime);padding:6px 12px;border-radius:6px;margin:0 16px;white-space:nowrap}
+
+  /* Filters */
+  .s-filters{padding:7px 18px;display:flex;gap:5px;align-items:center;border-bottom:1px solid var(--h);flex-wrap:wrap}
+  .sf{font-size:9px;font-weight:500;color:var(--is);background:var(--canvas);border:1px solid var(--h);padding:3px 9px;border-radius:9999px}
+  .sf.on{background:var(--lime);color:#000;border-color:var(--lime);font-weight:700}
+  .s-search{margin-left:auto;background:var(--s1);border:1px solid var(--h);border-radius:6px;padding:4px 10px;font-size:9px;color:var(--is);width:150px}
+  .s-label{padding:6px 18px 4px;font-size:9px;font-weight:600;color:var(--is);letter-spacing:0.4px;text-transform:uppercase}
+
+  /* Creator grid */
+  .c-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 18px 16px}
+  .cc{background:var(--s1);border:1px solid var(--h);border-radius:10px;overflow:hidden}
+  .thumb{aspect-ratio:16/9;position:relative;overflow:hidden}
+  .tv1{background:linear-gradient(165deg,#0a0c14,#141828,#0d1520,#080a10)}
+  .tv1::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 40%,rgba(180,140,60,0.18) 0%,transparent 55%),radial-gradient(ellipse at 75% 70%,rgba(40,60,120,0.15) 0%,transparent 50%)}
+  .tv1::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.012) 3px,rgba(255,255,255,0.012) 4px)}
+  .tm1{background:linear-gradient(145deg,#08050e,#1a0d28,#0d1820)}
+  .tm1::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 60% 30%,rgba(130,80,220,0.22) 0%,transparent 45%),radial-gradient(ellipse at 20% 70%,rgba(60,120,200,0.15) 0%,transparent 40%)}
+  .ti1{background:linear-gradient(135deg,#060810,#0f1820,#081020)}
+  .ti1::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 40% 50%,rgba(80,160,240,0.2) 0%,transparent 50%),radial-gradient(ellipse at 70% 30%,rgba(40,200,160,0.12) 0%,transparent 40%)}
+  .ta1{background:linear-gradient(160deg,#050510,#0a0820,#050510)}
+  .ta1::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(225,248,52,0.1) 0%,transparent 60%)}
+  .tb1{background:linear-gradient(155deg,#06080e,#0f1015,#080a10)}
+  .tb1::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(45deg);width:40%;height:40%;border:1px solid rgba(225,248,52,0.2);box-shadow:0 0 30px rgba(225,248,52,0.06)}
+  .tv2{background:linear-gradient(170deg,#0a0808,#1a1008,#100808)}
+  .tv2::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 35%,rgba(220,120,30,0.16) 0%,transparent 50%),radial-gradient(ellipse at 20% 60%,rgba(40,20,80,0.2) 0%,transparent 45%)}
+  .tv2::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.01) 3px,rgba(255,255,255,0.01) 4px)}
+  .tm2{background:linear-gradient(140deg,#050810,#0d1520,#050810)}
+  .tm2::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 40%,rgba(0,200,160,0.15) 0%,transparent 40%),radial-gradient(ellipse at 70% 60%,rgba(0,120,220,0.12) 0%,transparent 40%)}
+  .ti2{background:linear-gradient(150deg,#06090c,#0c1418,#060a0c)}
+  .ti2::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 55% 45%,rgba(255,180,40,0.14) 0%,transparent 45%),radial-gradient(ellipse at 30% 65%,rgba(200,60,60,0.1) 0%,transparent 40%)}
+  .t-ov{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(1,1,2,0.6) 100%)}
+  .t-badge{position:absolute;top:7px;right:7px;font-size:7px;font-weight:600;background:rgba(1,1,2,0.82);backdrop-filter:blur(6px);border:1px solid var(--h);color:var(--im);padding:2px 6px;border-radius:9999px;letter-spacing:0.3px;text-transform:uppercase}
+  .t-label{position:absolute;bottom:6px;left:7px;font-size:7px;color:rgba(255,255,255,0.38);font-style:italic}
+  .t-dur{position:absolute;bottom:6px;right:7px;font-size:7px;color:rgba(255,255,255,0.35)}
+  .cc-body{padding:10px 12px}
+  .cc-row{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+  .av{width:26px;height:26px;border-radius:50%;border:1px solid var(--h);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+  .av-a{background:linear-gradient(135deg,#1a1535,#2a2060);color:#828fff}
+  .av-b{background:linear-gradient(135deg,#0d2015,#1a3025);color:#27a644}
+  .av-c{background:linear-gradient(135deg,#201510,#3a2015);color:#d07040}
+  .av-d{background:linear-gradient(135deg,#150d20,#251535);color:#a060d0}
+  .av-e{background:linear-gradient(135deg,#0d1525,#152035);color:#5090d0}
+  .av-f{background:linear-gradient(135deg,#1a1a00,#2a2800);color:#e1f834}
+  .cc-name{font-size:11px;font-weight:600;color:var(--ink)}
+  .cc-handle{font-size:8px;color:var(--is)}
+  .b-ok{font-size:7px;font-weight:600;color:var(--ok);background:rgba(39,166,68,0.12);border:1px solid rgba(39,166,68,0.2);padding:2px 6px;border-radius:9999px;margin-left:auto}
+  .b-op{font-size:7px;font-weight:600;color:var(--lime);background:var(--lime-dim);border:1px solid var(--lime-border);padding:2px 6px;border-radius:9999px;margin-left:auto}
+  .cc-bio{font-size:9px;color:var(--im);line-height:1.5;margin-bottom:7px}
+  .tag-row{display:flex;gap:3px;flex-wrap:wrap}
+  .tag{font-size:7px;color:var(--is);background:var(--s3);border:1px solid var(--h);padding:1px 5px;border-radius:3px}
+
+  /* Jobs */
+  .j-list{display:flex;flex-direction:column;gap:7px;padding:8px 18px 16px}
+  .jc{background:var(--s1);border:1px solid var(--h);border-radius:10px;padding:11px 13px;display:flex;align-items:flex-start;gap:11px}
+  .jlogo{width:34px;height:34px;border-radius:8px;border:1px solid var(--h);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+  .jl-a{background:linear-gradient(135deg,#1a1535,#2a2060);color:#828fff}
+  .jl-b{background:linear-gradient(135deg,#0d2015,#1a3025);color:#27a644}
+  .jl-c{background:linear-gradient(135deg,#150d20,#251535);color:#a060d0}
+  .jl-d{background:linear-gradient(135deg,#1a0808,#301010);color:#d05050}
+  .jl-e{background:linear-gradient(135deg,#0d1525,#152035);color:#5090d0}
+  .jl-f{background:linear-gradient(135deg,#1a1208,#302008);color:#d09040}
+  .jl-g{background:linear-gradient(135deg,#1a1a00,#2a2800);color:#e1f834}
+  .jcontent{flex:1;min-width:0}
+  .jt-row{display:flex;align-items:center;gap:6px;margin-bottom:2px}
+  .jtitle{font-size:11px;font-weight:600;color:var(--ink)}
+  .j-urgent{font-size:7px;font-weight:600;color:#d07070;background:rgba(210,94,94,0.12);border:1px solid rgba(210,94,94,0.2);padding:2px 5px;border-radius:9999px;text-transform:uppercase;letter-spacing:0.3px}
+  .j-new{font-size:7px;font-weight:600;color:var(--lime);background:var(--lime-dim);border:1px solid var(--lime-border);padding:2px 5px;border-radius:9999px}
+  .jmeta{font-size:9px;color:var(--is);margin-bottom:6px}
+  .jmeta span{color:var(--im)}
+  .jfoot{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+  .jbudget{font-size:10px;font-weight:600;color:var(--ink);background:var(--s2);border:1px solid var(--h);padding:2px 7px;border-radius:5px}
+  .japply{margin-left:auto;font-size:9px;font-weight:700;color:#000;background:var(--lime);padding:5px 11px;border-radius:5px;flex-shrink:0}
+
+  /* Profile */
+  .p-hero{padding:14px 18px;background:var(--s1);border-bottom:1px solid var(--h);display:flex;align-items:flex-start;gap:14px;position:relative;overflow:hidden}
+  .p-hero::after{content:'';position:absolute;top:0;right:0;width:200px;height:100%;background:linear-gradient(135deg,transparent,rgba(225,248,52,0.04));pointer-events:none}
+  .pav{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#1a1535,#2a2060);border:2px solid var(--hs);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#828fff;flex-shrink:0}
+  .pdetails{flex:1;min-width:0}
+  .pname{font-size:15px;font-weight:600;color:var(--ink);letter-spacing:-0.3px;margin-bottom:2px}
+  .prole{font-size:9px;color:var(--im);margin-bottom:8px}
+  .pstats{display:flex;gap:16px;margin-bottom:8px}
+  .psv{font-size:14px;font-weight:600;color:var(--ink)}
+  .psl{font-size:7px;color:var(--is)}
+  .pactions{display:flex;gap:6px;margin-left:auto;flex-shrink:0}
+  .pmsg{font-size:10px;font-weight:600;color:var(--ink);background:var(--s2);border:1px solid var(--h);padding:6px 11px;border-radius:6px}
+  .phire{font-size:10px;font-weight:700;color:#000;background:var(--lime);padding:6px 13px;border-radius:6px}
+  .ptabs{display:flex;border-bottom:1px solid var(--h);padding:0 18px}
+  .ptab{font-size:10px;font-weight:500;color:var(--is);padding:8px 11px;border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer}
+  .ptab.on{color:var(--ink);font-weight:600;border-bottom-color:var(--lime)}
+  .port-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:10px 18px 16px}
+  .pi{background:var(--s1);border:1px solid var(--h);border-radius:9px;overflow:hidden}
+  .pi-media{aspect-ratio:4/3;position:relative;overflow:hidden}
+  .pi-info{padding:7px 10px;border-top:1px solid var(--h)}
+  .pi-title{font-size:10px;font-weight:600;color:var(--ink);margin-bottom:2px}
+  .pi-meta{font-size:8px;color:var(--is);display:flex;justify-content:space-between}
+
+  /* Carousel controls */
+  .c-controls{background:var(--s1);border-top:1px solid var(--h);padding:14px 20px;display:flex;align-items:center;justify-content:center;gap:20px}
+  .cdw{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
+  .cdot{width:6px;height:6px;border-radius:9999px;background:var(--hs);transition:all 0.2s;border:none}
+  .cdot.on{background:var(--lime);width:20px}
+  .clabel{font-size:11px;font-weight:500;color:var(--it);transition:color 0.2s}
+  .cdw.on .clabel{color:var(--im)}
+  .c-arr{background:var(--s2);border:1px solid var(--h);color:var(--is);width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;transition:all 0.15s;position:absolute;top:50%;transform:translateY(-50%)}
+  .c-arr:hover{background:var(--s3);color:var(--ink)}
+  .c-prev{left:14px}.c-next{right:14px}
+
+  /* TOOLS */
+  .tools-section{padding:52px 32px;border-top:1px solid var(--h);border-bottom:1px solid var(--h);overflow:hidden;position:relative}
+  .tools-section::before,.tools-section::after{content:'';position:absolute;top:0;bottom:0;width:120px;z-index:2;pointer-events:none}
+  .tools-section::before{left:0;background:linear-gradient(90deg,var(--canvas),transparent)}
+  .tools-section::after{right:0;background:linear-gradient(270deg,var(--canvas),transparent)}
+  .tools-label{text-align:center;font-size:12px;font-weight:500;color:var(--it);letter-spacing:0.4px;margin-bottom:26px;position:relative;z-index:3}
+  .tools-track-wrap{overflow:hidden}
+  .tools-track{display:flex;gap:10px;animation:scrollLeft 40s linear infinite;width:max-content}
+  .tools-track:hover{animation-play-state:paused}
+  @keyframes scrollLeft{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+  .tool-chip{background:var(--s1);border:1px solid var(--h);padding:8px 18px;border-radius:9999px;font-size:13px;font-weight:500;color:var(--im);white-space:nowrap;flex-shrink:0;transition:border-color 0.2s,color 0.2s}
+  .tool-chip:hover{border-color:var(--lime);color:var(--lime)}
+
+  /* VALUE */
+  .value-section{padding:88px 32px}
+  .value-inner{max-width:1120px;margin:0 auto}
+  .section-eyebrow{font-size:12px;font-weight:600;letter-spacing:0.6px;color:var(--lime);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+  .section-eyebrow::before{content:'';width:24px;height:1px;background:var(--lime)}
+  .section-headline{font-family:'Kanit',sans-serif;font-style:italic;font-weight:700;font-size:clamp(34px,5vw,52px);letter-spacing:-0.5px;line-height:1.05;color:var(--ink);margin-bottom:48px;max-width:560px}
+  .value-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--h);border-radius:14px;overflow:hidden}
+  .value-card{background:var(--s1);padding:36px 30px;position:relative;overflow:hidden;transition:background 0.2s}
+  .value-card:hover{background:var(--s2)}
+  .value-card::before{content:'';position:absolute;top:-1px;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--lime),transparent);opacity:0;transition:opacity 0.3s}
+  .value-card:hover::before{opacity:1}
+  .value-number{font-family:'Kanit',sans-serif;font-style:italic;font-weight:700;font-size:13px;color:var(--lime);letter-spacing:0.5px;margin-bottom:16px;opacity:0.7}
+  .value-icon{width:42px;height:42px;background:var(--lime-dim);border:1px solid var(--lime-border);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:19px}
+  .value-title{font-size:16px;font-weight:600;color:var(--ink);letter-spacing:-0.3px;margin-bottom:10px;line-height:1.3}
+  .value-body{font-size:14px;color:var(--im);line-height:1.7}
+
+  /* HOW */
+  .how-section{padding:88px 32px}
+  .how-inner{max-width:1120px;margin:0 auto}
+  .how-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:48px;margin-top:48px;position:relative}
+  .how-steps::before{content:'';position:absolute;top:28px;left:28px;right:28px;height:1px;background:rgba(225,248,52,0.3);z-index:0}
+  .how-step{position:relative;z-index:1}
+  .step-number{width:56px;height:56px;background:var(--s1);border:1px solid var(--hs);border-radius:9999px;display:flex;align-items:center;justify-content:center;font-family:'Kanit',sans-serif;font-style:italic;font-weight:700;font-size:20px;color:var(--lime);margin-bottom:20px;position:relative;z-index:2;transition:background 0.2s,border-color 0.2s}
+  .how-step:hover .step-number{background:var(--lime-dim);border-color:var(--lime)}
+  .step-title{font-size:16px;font-weight:600;color:var(--ink);letter-spacing:-0.3px;margin-bottom:10px}
+  .step-body{font-size:14px;color:var(--im);line-height:1.7}
+
+  /* WAITLIST */
+  .waitlist-section{padding:0 32px 88px}
+  .waitlist-inner{max-width:1120px;margin:0 auto}
+  .waitlist-card{background:var(--s1);border:1px solid var(--h);border-radius:20px;padding:64px;text-align:center;position:relative;overflow:hidden}
+  .waitlist-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% -20%,rgba(225,248,52,0.06) 0%,transparent 60%);pointer-events:none}
+  .waitlist-card::after{content:'';position:absolute;top:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(225,248,52,0.4),transparent)}
+  .waitlist-content{position:relative;z-index:1}
+  .waitlist-badge{display:inline-flex;align-items:center;gap:8px;background:var(--lime-dim);border:1px solid var(--lime-border);color:var(--lime);font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;padding:5px 14px;border-radius:9999px;margin-bottom:24px}
+  .waitlist-headline{font-family:'Kanit',sans-serif;font-style:italic;font-weight:700;font-size:clamp(34px,5vw,52px);letter-spacing:-0.5px;line-height:1.05;color:var(--ink);margin-bottom:16px}
+  .waitlist-body{font-size:17px;color:var(--im);line-height:1.7;margin-bottom:36px;max-width:500px;margin-left:auto;margin-right:auto}
+  .waitlist-form{display:flex;gap:10px;max-width:440px;margin:0 auto 12px}
+  .waitlist-input{flex:1;background:var(--s2);border:1px solid var(--hs);color:var(--ink);padding:14px 16px;border-radius:10px;font-size:15px;font-family:'Barlow',sans-serif;outline:none;transition:border-color 0.2s,box-shadow 0.2s;min-width:0}
+  .waitlist-input:focus{border-color:var(--lime);box-shadow:0 0 0 3px rgba(225,248,52,0.1)}
+  .waitlist-input::placeholder{color:var(--is)}
+  .waitlist-btn{font-size:15px;font-weight:700;color:#000;background:var(--lime);border:none;padding:14px 24px;border-radius:10px;cursor:pointer;white-space:nowrap;transition:opacity 0.15s}
+  .waitlist-btn:hover{opacity:0.88}
+  .waitlist-success{display:none;align-items:center;justify-content:center;gap:10px;background:rgba(39,166,68,0.1);border:1px solid rgba(39,166,68,0.2);color:var(--ok);padding:16px 24px;border-radius:10px;font-size:14px;font-weight:500;max-width:440px;margin:0 auto 12px}
+  .waitlist-success.show{display:flex}
+
+  /* FOOTER */
+  footer{border-top:1px solid var(--h);padding:36px 32px}
+  .footer-inner{max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+  .footer-links{display:flex;gap:22px;list-style:none}
+  .footer-links a{color:var(--is);font-size:13px;text-decoration:none;transition:color 0.15s}
+  .footer-links a:hover{color:var(--ink)}
+  .footer-copy{font-size:12px;color:var(--it)}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity 0.6s ease,transform 0.6s ease}
+  .reveal.visible{opacity:1;transform:translateY(0)}
+  .rd1{transition-delay:0.1s}.rd2{transition-delay:0.2s}
+
+  @media(max-width:768px){
+    .hero{padding:80px 20px 48px}
+    .hero-form,.waitlist-form{flex-direction:column}
+    .hero-btn,.waitlist-btn{width:100%;text-align:center}
+    .hero-socials{justify-content:center}
+    .value-grid,.how-steps{grid-template-columns:1fr}
+    .how-steps::before{display:none}
+    .waitlist-card{padding:36px 20px}
+    .footer-inner{flex-direction:column;gap:16px;text-align:center}
+    .footer-links{flex-wrap:wrap;justify-content:center;gap:14px}
+    nav,.carousel-section,.tools-section,.value-section,.how-section,.waitlist-section,footer{padding-left:20px;padding-right:20px}
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <img class="logo-wm" src="GenLeague_Wordmark.png" alt="GenLeague">
+    <a class="nav-cta" href="#waitlist">Join our waitlist</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow"><span class="eyebrow-dot"></span>Coming soon — be first in the league</div>
+    <h1 class="hero-headline">The league for<br><span class="accent">AI creative</span> talent.</h1>
+    <p class="hero-sub">GenLeague is the professional home built exclusively<br>for AI creatives — <em>launching soon.</em></p>
+    <p class="hero-tagline">Showcase your work. Get discovered. Get hired.</p>
+    <div class="hero-socials">
+      <span class="socials-label">Follow GenLeague:</span>
+      <a class="social-btn" href="https://x.com/thegenleague" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.631zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        @TheGenLeague
+      </a>
+      <a class="social-btn" href="https://instagram.com/thegenleague" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        @thegenleague
+      </a>
+      <a class="social-btn" href="https://tiktok.com/@genleague" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.19 8.19 0 004.84 1.56V6.79a4.85 4.85 0 01-1.07-.1z"/></svg>
+        @genleague
+      </a>
+    </div>
+    <div class="signup-count">
+      <div class="count-avatars">
+        <div class="count-avatar ca-1">MK</div>
+        <div class="count-avatar ca-2">JR</div>
+        <div class="count-avatar ca-3">SP</div>
+        <div class="count-avatar ca-4">AL</div>
+      </div>
+      <span class="count-text"><strong>174 AI creatives</strong> already on the waitlist</span>
+    </div>
+    <form class="hero-form" id="hero-form" onsubmit="submitHero(event)">
+      <input class="hero-input" type="email" placeholder="Enter your email for early access" required>
+      <button class="hero-btn" type="submit">Join our waitlist →</button>
+    </form>
+    <div class="success-msg" id="hero-success"><span>✓</span> You're on the waitlist. We'll reach out before launch.</div>
+    <p class="disclaimer">Free to join · No spam · Founding member perks at launch</p>
+  </div>
+</section>
+
+<!-- CAROUSEL -->
+<section class="carousel-section">
+  <div class="carousel-inner">
+    <p class="carousel-label reveal">A glimpse of GenLeague</p>
+    <div class="carousel-window reveal rd1">
+      <div class="c-chrome">
+        <div class="c-dots"><div class="cdot-sys cdr"></div><div class="cdot-sys cdy"></div><div class="cdot-sys cdg"></div></div>
+        <div class="c-url" id="c-url">thegenleague.com/discover</div>
+      </div>
+      <div class="c-track-wrap">
+        <div class="c-track" id="c-track">
+
+          <!-- SLIDE 1: DISCOVER -->
+          <div class="c-slide">
+            <div class="s-nav">
+              <img class="s-nav-logo" src="GenLeague_Wordmark.png" alt="GenLeague">
+              <div class="s-nav-links"><span class="snl on">Discover</span><span class="snl">Jobs</span><span class="snl">Trending</span></div>
+              <div class="s-nav-right">Sign in</div>
+            </div>
+            <div class="s-header"><div class="s-eye">GenLeague · Discover</div><div class="s-title">Discover AI Creatives</div><div class="s-sub">Browse portfolios from the league's top AI creative talent.</div></div>
+            <div class="s-stats">
+              <div class="ss"><div class="ss-v">2.4K</div><div class="ss-l">Creators</div></div>
+              <div class="ss"><div class="ss-v">18.2K</div><div class="ss-l">Projects</div></div>
+              <div class="ss"><div class="ss-v">340</div><div class="ss-l">Open Jobs</div></div>
+              <div class="ss"><div class="ss-v">94%</div><div class="ss-l">Hire Rate</div></div>
+              <div class="ss"><div class="ss-btn">Create your profile</div></div>
+            </div>
+            <div class="s-filters"><div class="sf on">All</div><div class="sf">AI Video</div><div class="sf">AI Image</div><div class="sf">AI Motion</div><div class="sf">AI Audio</div><div class="sf">AI Branding</div><div class="sf">Prompt Art</div><input class="s-search" placeholder="Search creators…" type="text"></div>
+            <div class="s-label">Featured Creators — 2,400+ in the league</div>
+            <div class="c-grid">
+              <div class="cc"><div class="thumb tv1"><div class="t-ov"></div><div class="t-badge">AI Video</div><div class="t-label">luxury · cinematic</div><div class="t-dur">▶ 0:32</div></div><div class="cc-body"><div class="cc-row"><div class="av av-a">MK</div><div><div class="cc-name">Maya Kato</div><div class="cc-handle">@mayakato · Tokyo</div></div><div class="b-ok">Available</div></div><div class="cc-bio">Cinematic AI video for luxury brands. Runway + Kling multi-model workflows. 5+ yrs motion design.</div><div class="tag-row"><span class="tag">Runway</span><span class="tag">Kling</span><span class="tag">Sora</span><span class="tag">After Effects</span></div></div></div>
+              <div class="cc"><div class="thumb ti1"><div class="t-ov"></div><div class="t-badge">AI Image</div><div class="t-label">editorial · abstract</div></div><div class="cc-body"><div class="cc-row"><div class="av av-b">JR</div><div><div class="cc-name">James Rivera</div><div class="cc-handle">@jrivera.ai · NYC</div></div><div class="b-op">Open to work</div></div><div class="cc-bio">Brand and editorial AI image direction. Midjourney + ComfyUI specialist. Featured in Wired, The Verge.</div><div class="tag-row"><span class="tag">Midjourney</span><span class="tag">ComfyUI</span><span class="tag">Magnific</span></div></div></div>
+              <div class="cc"><div class="thumb tm1"><div class="t-ov"></div><div class="t-badge">AI Motion</div><div class="t-label">generative · particles</div><div class="t-dur">▶ 1:14</div></div><div class="cc-body"><div class="cc-row"><div class="av av-c">SP</div><div><div class="cc-name">Sofia Park</div><div class="cc-handle">@sofiapark · Seoul</div></div><div class="b-ok">Available</div></div><div class="cc-bio">Generative motion and immersive AI experiences for events, installations, and brand campaigns.</div><div class="tag-row"><span class="tag">Stable Diffusion</span><span class="tag">TouchDesigner</span><span class="tag">Deforum</span></div></div></div>
+              <div class="cc"><div class="thumb tb1"><div class="t-ov"></div><div class="t-badge">AI Branding</div><div class="t-label">identity · systems</div></div><div class="cc-body"><div class="cc-row"><div class="av av-d">AL</div><div><div class="cc-name">Alex Laurent</div><div class="cc-handle">@alexlaurent · Paris</div></div><div class="b-op">Open to work</div></div><div class="cc-bio">Full brand identity systems with AI-assisted design. Logos, campaigns, visual languages for global brands.</div><div class="tag-row"><span class="tag">Midjourney</span><span class="tag">Figma</span><span class="tag">Ideogram</span></div></div></div>
+              <div class="cc"><div class="thumb ta1"><div class="t-ov"></div><div class="t-badge">AI Audio</div><div class="t-label">voice · soundscape</div><div class="t-dur">♪ 2:08</div></div><div class="cc-body"><div class="cc-row"><div class="av av-e">TC</div><div><div class="cc-name">Tyler Chen</div><div class="cc-handle">@tylerchen · LA</div></div><div class="b-ok">Available</div></div><div class="cc-bio">AI audio and voice production for ads, games, and podcasts. ElevenLabs specialist with 8+ yr music background.</div><div class="tag-row"><span class="tag">ElevenLabs</span><span class="tag">Suno</span><span class="tag">Udio</span></div></div></div>
+              <div class="cc"><div class="thumb tv2"><div class="t-ov"></div><div class="t-badge">AI Video</div><div class="t-label">fashion · product</div><div class="t-dur">▶ 0:58</div></div><div class="cc-body"><div class="cc-row"><div class="av av-f">NW</div><div><div class="cc-name">Nina Walsh</div><div class="cc-handle">@ninawalsh · London</div></div><div class="b-ok">Available</div></div><div class="cc-bio">Fashion and luxury brand AI video. Photo-realistic product campaigns using Veo 2 and Runway pipelines.</div><div class="tag-row"><span class="tag">Veo 2</span><span class="tag">Runway</span><span class="tag">Higgsfield</span></div></div></div>
+            </div>
+          </div>
+
+          <!-- SLIDE 2: JOBS -->
+          <div class="c-slide">
+            <div class="s-nav">
+              <img class="s-nav-logo" src="GenLeague_Wordmark.png" alt="GenLeague">
+              <div class="s-nav-links"><span class="snl">Discover</span><span class="snl on">Jobs</span><span class="snl">Trending</span></div>
+              <div class="s-nav-right">Sign in</div>
+            </div>
+            <div class="s-header"><div class="s-eye">GenLeague Jobs</div><div class="s-title">AI Creative Jobs</div><div class="s-sub">Browse roles from brands, agencies, and studios looking for serious AI creative talent.</div></div>
+            <div class="s-filters"><div class="sf on">All Jobs</div><div class="sf">AI Video</div><div class="sf">AI Image</div><div class="sf">AI Motion</div><div class="sf">AI Audio</div><div class="sf">Ongoing</div><div class="sf">Full-time</div><input class="s-search" placeholder="Search jobs…" type="text"></div>
+            <div class="s-label">340 open positions · updated daily</div>
+            <div class="j-list">
+              <div class="jc"><div class="jlogo jl-a">VS</div><div class="jcontent"><div class="jt-row"><div class="jtitle">AI Video Director — Luxury Brand Campaigns</div><div class="j-urgent">Urgent</div></div><div class="jmeta"><span>Voxel Studios</span> · Remote · One-off · Posted 2h ago</div><div class="jfoot"><span class="jbudget">$3,000–$5,000</span><span class="tag">Runway</span><span class="tag">Kling</span><span class="tag">Sora</span><div class="japply">Apply</div></div></div></div>
+              <div class="jc"><div class="jlogo jl-b">NM</div><div class="jcontent"><div class="jt-row"><div class="jtitle">AI Image Artist — Editorial & Fashion</div><div class="j-new">New</div></div><div class="jmeta"><span>Nova Magazine</span> · Remote · Ongoing retainer · Posted 4h ago</div><div class="jfoot"><span class="jbudget">$800–$1,200/mo</span><span class="tag">Midjourney</span><span class="tag">Firefly</span><span class="tag">Magnific</span><div class="japply">Apply</div></div></div></div>
+              <div class="jc"><div class="jlogo jl-c">AX</div><div class="jcontent"><div class="jt-row"><div class="jtitle">Generative Motion Designer</div></div><div class="jmeta"><span>Axiom Creative Agency</span> · Remote · Full-time · Posted 1d ago</div><div class="jfoot"><span class="jbudget">$80K–$110K/yr</span><span class="tag">Stable Diffusion</span><span class="tag">After Effects</span><span class="tag">TouchDesigner</span><div class="japply">Apply</div></div></div></div>
+              <div class="jc"><div class="jlogo jl-d">FD</div><div class="jcontent"><div class="jt-row"><div class="jtitle">AI Brand Identity Designer</div><div class="j-urgent">Urgent</div></div><div class="jmeta"><span>Fable Digital</span> · Remote · One-off · Posted 5h ago</div><div class="jfoot"><span class="jbudget">$2,500–$4,000</span><span class="tag">Midjourney</span><span class="tag">Figma</span><span class="tag">Ideogram</span><div class="japply">Apply</div></div></div></div>
+              <div class="jc"><div class="jlogo jl-e">EL</div><div class="jcontent"><div class="jt-row"><div class="jtitle">AI Voice & Audio Producer — Podcast Network</div><div class="j-new">New</div></div><div class="jmeta"><span>Echo Labs</span> · Remote · Ongoing retainer · Posted 6h ago</div><div class="jfoot"><span class="jbudget">$500–$900/mo</span><span class="tag">ElevenLabs</span><span class="tag">Suno</span><span class="tag">Udio</span><div class="japply">Apply</div></div></div></div>
+              <div class="jc"><div class="jlogo jl-f">OR</div><div class="jcontent"><div class="jt-row"><div class="jtitle">AI Creative Director — Streetwear Campaign</div></div><div class="jmeta"><span>Origin Collective</span> · Remote · One-off · Posted 8h ago</div><div class="jfoot"><span class="jbudget">$4,000–$7,000</span><span class="tag">Midjourney</span><span class="tag">Runway</span><span class="tag">Higgsfield</span><div class="japply">Apply</div></div></div></div>
+              <div class="jc"><div class="jlogo jl-g">PL</div><div class="jcontent"><div class="jt-row"><div class="jtitle">Prompt Engineer & AI Art Director</div><div class="j-new">New</div></div><div class="jmeta"><span>Pulse Labs</span> · Remote · Part-time · Posted 12h ago</div><div class="jfoot"><span class="jbudget">$1,500–$2,500/mo</span><span class="tag">Midjourney</span><span class="tag">ComfyUI</span><span class="tag">Leonardo</span><div class="japply">Apply</div></div></div></div>
+            </div>
+          </div>
+
+          <!-- SLIDE 3: PROFILE -->
+          <div class="c-slide">
+            <div class="s-nav">
+              <img class="s-nav-logo" src="GenLeague_Wordmark.png" alt="GenLeague">
+              <div class="s-nav-links"><span class="snl">Discover</span><span class="snl">Jobs</span><span class="snl on">Profile</span></div>
+              <div class="s-nav-right">Sign in</div>
+            </div>
+            <div class="p-hero">
+              <div class="pav">MK</div>
+              <div class="pdetails">
+                <div class="pname">Maya Kato</div>
+                <div class="prole">AI Video Director · Motion Designer · GenLeague Member since 2026</div>
+                <div class="pstats"><div><div class="psv">47</div><div class="psl">Projects</div></div><div><div class="psv">12</div><div class="psl">Clients</div></div><div><div class="psv">4.9 ★</div><div class="psl">Rating</div></div></div>
+                <div class="tag-row"><span class="tag">Runway</span><span class="tag">Kling</span><span class="tag">Sora</span><span class="tag">After Effects</span><span class="tag">Higgsfield</span><span style="font-size:7px;font-weight:600;color:var(--ok);background:rgba(39,166,68,0.12);border:1px solid rgba(39,166,68,0.2);padding:2px 7px;border-radius:9999px;margin-left:4px;">Available</span></div>
+              </div>
+              <div class="pactions"><div class="pmsg">Message</div><div class="phire">Hire on GenLeague</div></div>
+            </div>
+            <div class="ptabs"><div class="ptab on">Portfolio</div><div class="ptab">About</div><div class="ptab">Reviews (12)</div><div class="ptab">Services</div></div>
+            <div class="s-label">47 projects · AI Video, AI Motion</div>
+            <div class="port-grid">
+              <div class="pi"><div class="pi-media tv1"><div class="t-ov"></div><div class="t-badge">AI Video</div><div class="t-dur">▶ 0:32</div></div><div class="pi-info"><div class="pi-title">Luxury Brand Campaign — Voxel Studios</div><div class="pi-meta"><span>Runway · Kling</span><span>Commercial</span></div></div></div>
+              <div class="pi"><div class="pi-media tm1"><div class="t-ov"></div><div class="t-badge">AI Motion</div><div class="t-dur">▶ 1:14</div></div><div class="pi-info"><div class="pi-title">Film Festival Title Sequence</div><div class="pi-meta"><span>Sora · After Effects</span><span>Personal</span></div></div></div>
+              <div class="pi"><div class="pi-media tv2"><div class="t-ov"></div><div class="t-badge">AI Video</div><div class="t-dur">▶ 0:45</div></div><div class="pi-info"><div class="pi-title">Product Launch — Tech Startup</div><div class="pi-meta"><span>Runway · Topaz</span><span>Commercial</span></div></div></div>
+              <div class="pi"><div class="pi-media tm2"><div class="t-ov"></div><div class="t-badge">AI Motion</div><div class="t-dur">▶ 2:01</div></div><div class="pi-info"><div class="pi-title">Immersive Brand Installation — Nike</div><div class="pi-meta"><span>Higgsfield · Deforum</span><span>Commercial</span></div></div></div>
+              <div class="pi"><div class="pi-media ti2"><div class="t-ov"></div><div class="t-badge">AI Video</div><div class="t-dur">▶ 0:28</div></div><div class="pi-info"><div class="pi-title">Fashion Editorial — Vogue Arabia</div><div class="pi-meta"><span>Veo 2 · Kling</span><span>Commercial</span></div></div></div>
+              <div class="pi"><div class="pi-media tm1" style="filter:hue-rotate(60deg)"><div class="t-ov"></div><div class="t-badge">AI Motion</div><div class="t-dur">▶ 1:45</div></div><div class="pi-info"><div class="pi-title">Generative Concert Visuals</div><div class="pi-meta"><span>Stable Diffusion · TouchDesigner</span><span>Personal</span></div></div></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <button class="c-arr c-prev" onclick="moveSlide(-1)">←</button>
+      <button class="c-arr c-next" onclick="moveSlide(1)">→</button>
+      <div class="c-controls">
+        <div class="cdw on" onclick="goSlide(0)" id="dw0"><button class="cdot on" id="d0"></button><span class="clabel">Discover Creators</span></div>
+        <div class="cdw" onclick="goSlide(1)" id="dw1"><button class="cdot" id="d1"></button><span class="clabel">Browse Jobs</span></div>
+        <div class="cdw" onclick="goSlide(2)" id="dw2"><button class="cdot" id="d2"></button><span class="clabel">Creator Profiles</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section class="tools-section">
+  <p class="tools-label">Showcase the work you make with your favourite tools</p>
+  <div class="tools-track-wrap">
+    <div class="tools-track">
+      <div class="tool-chip">Midjourney</div><div class="tool-chip">Runway</div><div class="tool-chip">Sora</div><div class="tool-chip">ElevenLabs</div><div class="tool-chip">Kling</div><div class="tool-chip">Higgsfield</div><div class="tool-chip">Stable Diffusion</div><div class="tool-chip">ComfyUI</div><div class="tool-chip">Veo 2</div><div class="tool-chip">Firefly</div><div class="tool-chip">Pika</div><div class="tool-chip">Topaz</div><div class="tool-chip">Udio</div><div class="tool-chip">Suno</div><div class="tool-chip">Leonardo</div><div class="tool-chip">Magnific</div><div class="tool-chip">Ideogram</div><div class="tool-chip">Luma</div><div class="tool-chip">Hailuo</div><div class="tool-chip">InVideo</div><div class="tool-chip">Krea</div><div class="tool-chip">Weavy</div>
+      <div class="tool-chip">Midjourney</div><div class="tool-chip">Runway</div><div class="tool-chip">Sora</div><div class="tool-chip">ElevenLabs</div><div class="tool-chip">Kling</div><div class="tool-chip">Higgsfield</div><div class="tool-chip">Stable Diffusion</div><div class="tool-chip">ComfyUI</div><div class="tool-chip">Veo 2</div><div class="tool-chip">Firefly</div><div class="tool-chip">Pika</div><div class="tool-chip">Topaz</div><div class="tool-chip">Udio</div><div class="tool-chip">Suno</div><div class="tool-chip">Leonardo</div><div class="tool-chip">Magnific</div><div class="tool-chip">Ideogram</div><div class="tool-chip">Luma</div><div class="tool-chip">Hailuo</div><div class="tool-chip">InVideo</div><div class="tool-chip">Krea</div><div class="tool-chip">Weavy</div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUE PROPS -->
+<section class="value-section">
+  <div class="value-inner">
+    <div class="section-eyebrow reveal">Why GenLeague</div>
+    <h2 class="section-headline reveal rd1">AI creative work deserves its own platform.</h2>
+    <div class="value-grid">
+      <div class="value-card reveal"><div class="value-number">01</div><div class="value-icon">🎨</div><div class="value-title">Built for how AI creatives actually work</div><div class="value-body">Tag your tools, show your process, and let your portfolio speak. GenLeague understands the difference between Midjourney and ComfyUI, between Runway and Kling — built by people who use them.</div></div>
+      <div class="value-card reveal rd1"><div class="value-number">02</div><div class="value-icon">🔍</div><div class="value-title">Get discovered by clients who get it</div><div class="value-body">Brands, agencies, and studios that understand AI creative work come to GenLeague first. No more explaining what you do. The clients here already know — they just need to find you.</div></div>
+      <div class="value-card reveal rd2"><div class="value-number">03</div><div class="value-icon">💼</div><div class="value-title">A job board that fits the work</div><div class="value-body">AI creative jobs from clients who understand the craft. Browse by tool, category, and budget. Apply directly and get to work — no generic freelance marketplace noise.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section">
+  <div class="how-inner">
+    <div class="section-eyebrow reveal">How GenLeague works</div>
+    <h2 class="section-headline reveal rd1">Three steps into the league.</h2>
+    <div class="how-steps">
+      <div class="how-step reveal"><div class="step-number">01</div><div class="step-title">Build your profile</div><div class="step-body">Upload your best work, tag your tools, and show your creative process. Your GenLeague profile is your professional identity in the AI creative world.</div></div>
+      <div class="how-step reveal rd1"><div class="step-number">02</div><div class="step-title">Get discovered</div><div class="step-body">Clients browse GenLeague looking for exactly what you do. Your work gets in front of people who are ready to hire — not just browse.</div></div>
+      <div class="how-step reveal rd2"><div class="step-number">03</div><div class="step-title">Get hired and grow</div><div class="step-body">Work directly with clients through GenLeague. Build your reputation with reviews and ratings. The more you work, the stronger your standing in the league.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- WAITLIST -->
+<section class="waitlist-section" id="waitlist">
+  <div class="waitlist-inner">
+    <div class="waitlist-card reveal">
+      <div class="waitlist-content">
+        <div class="waitlist-badge">🚀 Launching soon</div>
+        <h2 class="waitlist-headline">Get early access to GenLeague.</h2>
+        <p class="waitlist-body">We're building the professional home for AI creative talent. Join the waitlist to be first in the door when GenLeague launches.</p>
+        <form class="waitlist-form" id="waitlist-form" onsubmit="submitWaitlist(event)">
+          <input class="waitlist-input" type="email" placeholder="Your email address" required>
+          <button class="waitlist-btn" type="submit">Join our waitlist</button>
+        </form>
+        <div class="waitlist-success" id="waitlist-success"><span>✓</span> You're on the waitlist. We'll be in touch before we launch.</div>
+        <p class="disclaimer">Free to join · No spam · Founding member perks at launch</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <img class="logo-sm" src="GenLeague_Wordmark.png" alt="GenLeague">
+    <ul class="footer-links">
+      <li><a href="https://x.com/thegenleague" target="_blank">X / Twitter</a></li>
+      <li><a href="https://instagram.com/thegenleague" target="_blank">Instagram</a></li>
+      <li><a href="https://tiktok.com/@genleague" target="_blank">TikTok</a></li>
+      <li><a href="#">Terms</a></li>
+      <li><a href="#">Privacy</a></li>
+    </ul>
+    <p class="footer-copy">© 2026 GenLeague. The league for AI creative talent.</p>
+  </div>
+</footer>
+
+<script>
+  window.addEventListener('scroll',()=>{ document.getElementById('nav').classList.toggle('scrolled',window.scrollY>40); });
+  function submitHero(e){ e.preventDefault(); document.getElementById('hero-form').style.display='none'; document.getElementById('hero-success').classList.add('show'); }
+  function submitWaitlist(e){ e.preventDefault(); document.getElementById('waitlist-form').style.display='none'; document.getElementById('waitlist-success').classList.add('show'); }
+  const urls=['thegenleague.com/discover','thegenleague.com/jobs','thegenleague.com/profile'];
+  let cur=0; const total=3;
+  function updateCarousel(){
+    document.getElementById('c-track').style.transform=`translateX(-${cur*100}%)`;
+    document.getElementById('c-url').textContent=urls[cur];
+    for(let i=0;i<total;i++){
+      document.getElementById('d'+i).classList.toggle('on',i===cur);
+      document.getElementById('dw'+i).classList.toggle('on',i===cur);
+    }
+  }
+  function moveSlide(dir){ cur=(cur+dir+total)%total; updateCarousel(); }
+  function goSlide(i){ cur=i; updateCarousel(); }
+  setInterval(()=>moveSlide(1),6000);
+  const obs=new IntersectionObserver(entries=>{ entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); } }); },{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
