@@ -598,32 +598,7 @@
 
 <script>
   window.addEventListener('scroll',()=>{ document.getElementById('nav').classList.toggle('scrolled',window.scrollY>40); });
-  const BEEHIIV_PUB_ID = 'pub_78cec05f-75bd-4f8d-a1fa-befb883cc9bf';
-  const BEEHIIV_API_KEY = '7FBG9YwgD4Fj4QN6CYTXGTnUfxzA2vBSi7VL6uHdTUQAKp3KwcBcq5jqqVGdefYg';
-
-  async function subscribeToBeehiiv(email) {
-    try {
-      const response = await fetch(`https://api.beehiiv.com/v2/publications/${BEEHIIV_PUB_ID}/subscriptions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${BEEHIIV_API_KEY}`
-        },
-        body: JSON.stringify({
-          email: email,
-          reactivate_existing: false,
-          send_welcome_email: true,
-          utm_source: 'landing_page',
-          utm_medium: 'organic',
-          utm_campaign: 'waitlist'
-        })
-      });
-      return response.ok;
-    } catch(err) {
-      console.error('Beehiiv error:', err);
-      return false;
-    }
-  }
+  const FORMSPREE_URL = 'https://formspree.io/f/mjgljnzj';
 
   async function submitHero(e) {
     e.preventDefault();
@@ -631,7 +606,13 @@
     const btn = document.querySelector('#hero-form .hero-btn');
     btn.textContent = 'Joining...';
     btn.style.opacity = '0.7';
-    const success = await subscribeToBeehiiv(email);
+    try {
+      await fetch(FORMSPREE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ email: email, source: 'hero_form' })
+      });
+    } catch(err) { console.error(err); }
     document.getElementById('hero-form').style.display = 'none';
     document.getElementById('hero-success').classList.add('show');
   }
@@ -642,7 +623,13 @@
     const btn = document.querySelector('#waitlist-form .waitlist-btn');
     btn.textContent = 'Joining...';
     btn.style.opacity = '0.7';
-    const success = await subscribeToBeehiiv(email);
+    try {
+      await fetch(FORMSPREE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ email: email, source: 'waitlist_form' })
+      });
+    } catch(err) { console.error(err); }
     document.getElementById('waitlist-form').style.display = 'none';
     document.getElementById('waitlist-success').classList.add('show');
   }
