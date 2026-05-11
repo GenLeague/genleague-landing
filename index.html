@@ -278,7 +278,9 @@
   .rd1{transition-delay:0.1s}.rd2{transition-delay:0.2s}
 
   @media(max-width:768px){
-    .hero{padding:80px 20px 48px}
+    /* General */
+    nav,.carousel-section,.tools-section,.value-section,.how-section,.waitlist-section,footer{padding-left:16px;padding-right:16px}
+    .hero{padding:80px 16px 48px}
     .hero-form,.waitlist-form{flex-direction:column}
     .hero-btn,.waitlist-btn{width:100%;text-align:center}
     .hero-socials{justify-content:center}
@@ -287,7 +289,90 @@
     .waitlist-card{padding:36px 20px}
     .footer-inner{flex-direction:column;gap:16px;text-align:center}
     .footer-links{flex-wrap:wrap;justify-content:center;gap:14px}
-    nav,.carousel-section,.tools-section,.value-section,.how-section,.waitlist-section,footer{padding-left:20px;padding-right:20px}
+
+    /* Carousel — single column creator cards */
+    .c-grid{grid-template-columns:1fr;gap:8px;padding:0 12px 12px}
+
+    /* Creator card mobile fixes */
+    .cc-row{flex-wrap:nowrap;gap:6px}
+    .cc-name{font-size:12px}
+    .cc-handle{font-size:9px}
+    .cc-bio{font-size:10px;-webkit-line-clamp:3}
+    .b-ok,.b-op{font-size:8px;padding:2px 7px;white-space:nowrap;flex-shrink:0}
+
+    /* Slide nav mobile */
+    .s-nav{padding:8px 12px;gap:10px;overflow:hidden}
+    .s-nav-logo{height:14px}
+    .s-nav-links{gap:10px}
+    .snl{font-size:9px}
+    .s-nav-right{font-size:9px;padding:4px 8px}
+
+    /* Page header mobile */
+    .s-header{padding:10px 12px 8px}
+    .s-title{font-size:15px}
+    .s-sub{font-size:9px}
+
+    /* Stats bar — scroll horizontally on mobile */
+    .s-stats{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .ss{padding:8px 12px;flex-shrink:0}
+    .ss-v{font-size:13px}
+    .ss-btn{font-size:9px;padding:5px 10px;margin:0 10px;white-space:nowrap;flex-shrink:0}
+
+    /* Filters — scroll horizontally */
+    .s-filters{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;padding:6px 12px;gap:5px}
+    .sf{flex-shrink:0}
+    .s-search{display:none}
+    .s-label{padding:5px 12px 3px}
+
+    /* Jobs mobile */
+    .j-list{padding:6px 12px 12px;gap:6px}
+    .jc{padding:10px 12px;gap:10px}
+    .jlogo{width:30px;height:30px;font-size:9px;border-radius:7px;flex-shrink:0}
+    .jtitle{font-size:10px;line-height:1.3}
+    .jmeta{font-size:8px;margin-bottom:5px}
+    .jfoot{flex-wrap:wrap;gap:4px}
+    .jbudget{font-size:9px}
+    .japply{font-size:9px;padding:5px 10px}
+    .j-urgent,.j-new{font-size:7px}
+    .tag{font-size:7px}
+
+    /* Profile mobile */
+    .p-hero{flex-wrap:wrap;padding:12px;gap:10px}
+    .pav{width:44px;height:44px;font-size:16px}
+    .pdetails{min-width:0;flex:1}
+    .pname{font-size:13px}
+    .prole{font-size:8px;margin-bottom:6px}
+    .pstats{gap:12px;margin-bottom:6px}
+    .psv{font-size:12px}
+    .psl{font-size:7px}
+    .pactions{width:100%;justify-content:flex-end;margin-left:0;margin-top:6px}
+    .pmsg{font-size:9px;padding:5px 10px}
+    .phire{font-size:9px;padding:5px 11px}
+    .ptabs{padding:0 12px;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap}
+    .ptab{flex-shrink:0;font-size:9px;padding:7px 10px}
+
+    /* Portfolio grid — 2 col on mobile */
+    .port-grid{grid-template-columns:repeat(2,1fr);gap:6px;padding:8px 12px 12px}
+    .pi-title{font-size:9px}
+    .pi-meta{font-size:7px}
+
+    /* Carousel controls */
+    .c-controls{padding:10px 16px;gap:14px}
+    .clabel{font-size:10px}
+    .c-arr{width:26px;height:26px;font-size:12px}
+    .c-prev{left:8px}
+    .c-next{right:8px}
+  }
+
+  @media(max-width:480px){
+    .hero-headline{font-size:44px;letter-spacing:-1px}
+    .hero-tagline{font-size:14px}
+    .hero-sub{font-size:14px}
+    /* Stack creator grid to single column and simplify */
+    .c-grid{grid-template-columns:1fr}
+    .cc-bio{display:none} /* hide bio at very small screens to reduce clutter */
+    .port-grid{grid-template-columns:1fr}
+    .s-stats{font-size:12px}
   }
 </style>
 </head>
